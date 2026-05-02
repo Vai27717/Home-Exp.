@@ -17,33 +17,101 @@
     table th { background:#555; }
     .delete-item-main { background:none; border:none; color:#f87171; font-weight:bold; cursor:pointer; }
     .btn-small { padding:4px 8px; border-radius:4px; }
+    
+    #mat-list::-webkit-scrollbar {
+  width: 5px;
+}
+#mat-list::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+ 
   </style>
 </head>
 <body>
-<div class="card">
-  <h2 class="text-2xl font-bold mb-4">🏠 Home Expenses (Sheet Sync)</h2>
-  <div style="margin-left:auto;font-weight:700">Application Developed by Vaibhav Enterprises</div>
 
+<div id="home-screen">
+
+<div class="card">
+  <h3 class="text-lg font-semibold mb-2">📊 Dashboard</h3>
+  <button onclick="openApp()" class="bg-green-600 px-4 py-2 rounded">
+👉 Open App
+<div style="margin-right:auto;font-weight:700">Application Developed by Vaibhav Enterprises</div>
+</button>
+    
+  <div class="card">
+  <h3 class="text-lg font-semibold mb-2">🏦 Bank Summary</h3>
+  <div id="bank-summary" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
+</div>
+   
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+
+    <div class="bg-gray-700 p-3 rounded">
+      <div>Today In</div>
+      <div id="today-in">0</div>
+    </div>
+
+    <div class="bg-gray-700 p-3 rounded">
+      <div>Today Out</div>
+      <div id="today-out">0</div>
+    </div>
+
+    <div class="bg-gray-700 p-3 rounded">
+      <div>This Month In</div>
+      <div id="month-in">0</div>
+    </div>
+
+    <div class="bg-gray-700 p-3 rounded">
+      <div>This Month Out</div>
+      <div id="month-out">0</div>
+    </div>
+
+  </div>
+</div>
+<canvas id="bankChart" height="200"></canvas>
+
+ 
+
+
+</div>
+
+
+
+
+<div id="app-screen" style="display:none;">
+
+<div class="card">
+  <h2 class="text-2xl font-bold mb-4">🏠 Home Expenses</h2>
+  
+  <button onclick="goHome()" class="bg-blue-600 px-3 py-2 rounded mb-3">
+⬅ Back to Home
+</button>
   <div class="grid grid-cols-2 gap-4 mb-4">
     <div class="text-green-500 font-semibold">Total In: ₹<span id="h-in-total">0.00</span></div>
     <div class="text-white-500 font-semibold text-right">Total Out: ₹<span id="h-out-total">0.00</span></div>
+     <div class="text-yellow-400 font-semibold">
+  Balance: ₹<span id="h-balance">0.00</span>
+</div>
+    
   </div>
 
   <div class="grid md:grid-cols-2 gap-4 mb-4">
     <div>
       <label class="block mb-1">Select Account</label>
       <select id="h-bank" class="p-2 rounded w-full">
-      <option value="Kotak Bank">Kotak Bank</option>  
-      <option value="SBI Bank">SBI Bank</option>
-      <option value="HDFC Bank">HDFC Bank</option>
-      <option value="Cash">Cash</option>
-      </select>
+  <option value="">-- Select Account --</option>
+  <option value="Kotak Bank">Kotak Bank</option>  
+  <option value="SBI Bank">SBI Bank</option>
+  <option value="HDFC Bank">HDFC Bank</option>
+  <option value="Cash">Cash</option>
+</select>
     </div>
     <div>
       <label class="block mb-1">Payment Type</label>
       <select id="h-type" class="p-2 rounded w-full">
         <option value="in">Payment In</option>
         <option value="out">Payment Out</option>
+        <option value="transfer">Self Transfer</option>
       </select>
     </div>
   </div>
@@ -101,13 +169,21 @@
     <div><label>Date To:</label><input type="date" id="flt-date-to" class="p-1 rounded"/></div>
     <div><label>Month:</label><input type="month" id="flt-month" class="p-1 rounded"/></div>
     <div><label>Payment Type:</label>
-      <select id="flt-type" class="p-1 rounded"><option value="">All</option><option value="in">In</option><option value="out">Out</option></select>
+      <select id="flt-type" class="p-1 rounded">
+  <option value="">All</option>
+  <option value="in">In</option>
+  <option value="out">Out</option>
+  <option value="transfer">Transfer</option>
+</select>
     </div>
     <div><label>Category:</label><select id="flt-cat" class="p-1 rounded"><option value="">All</option></select></div>
     <button id="btn-apply-f" class="px-3 py-1 bg-blue-600 rounded">Apply Filter</button>
     <button id="btn-export-pdf" class="px-3 py-1 bg-purple-600 rounded">📄 Export PDF</button>
   </div>
 </div>
+
+
+
 
 <div id="saved-section" class="card hidden">
   <h3 class="text-lg font-semibold mt-2 mb-2">📂 Saved H Expenses</h3>
@@ -118,22 +194,96 @@
 
 <!-- Material modal (same as before) -->
 <div id="material-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
-  <div class="bg-gray-800 p-6 rounded w-full max-w-xl relative">
-    <button onclick="closeMaterialPopup()" class="absolute top-2 right-2 text-red-400 text-xl">❌</button>
-    <h2 class="text-2xl font-bold mb-4">📋 Material List</h2>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2">
-      <input id="mat-item" class="p-2 rounded bg-gray-700 w-full" placeholder="Item"/>
-      <input id="mat-qty" type="number" min="1" value="1" class="p-2 rounded bg-gray-700 w-full" placeholder="Qty"/>
-      <input id="mat-unit" class="p-2 rounded bg-gray-700 w-full" placeholder="Unit"/>
+  
+  <div class="bg-gray-800 w-full max-w-xl rounded shadow-lg flex flex-col max-h-[90vh]">
+
+    <!-- 🔹 HEADER (Fixed) -->
+    <div class="flex justify-between items-center p-4 border-b border-gray-600">
+      <h2 class="text-xl font-bold">📋 Material List</h2>
+      <button onclick="closeMaterialPopup()" class="text-red-400 text-xl">❌</button>
     </div>
-    <button onclick="addMaterial()" class="px-3 py-2 bg-green-600 rounded mb-2 w-full md:w-auto">➕ Add</button>
-    <ul id="mat-list" class="space-y-1"></ul>
-    <div class="flex flex-col md:flex-row gap-2 mt-3">
+
+    <!-- 🔹 BODY (Scrollable) -->
+    <div class="p-4 overflow-y-auto flex-1">
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-3">
+        <input id="mat-item" class="p-2 rounded bg-gray-700 w-full" placeholder="Item"/>
+        <input id="mat-qty" type="number" min="1" value="1" class="p-2 rounded bg-gray-700 w-full" placeholder="Qty"/>
+        <input id="mat-unit" class="p-2 rounded bg-gray-700 w-full" placeholder="Unit"/>
+      </div>
+
+      <button onclick="addMaterial()" class="px-3 py-2 bg-green-600 rounded mb-3 w-full md:w-auto">➕ Add</button>
+
+      <!-- 🔸 SCROLL LIST -->
+      <ul id="mat-list" class="space-y-2 max-h-[250px] overflow-y-auto pr-1"></ul>
+
+    </div>
+
+    <!-- 🔹 FOOTER (Fixed) -->
+    <div class="p-4 border-t border-gray-600 flex flex-col md:flex-row gap-2">
       <button onclick="shareMaterial()" class="px-4 py-2 bg-blue-600 rounded w-full md:w-auto">📤 Share</button>
       <button onclick="clearMaterial()" class="px-4 py-2 bg-red-600 rounded w-full md:w-auto">🗑 Clear</button>
     </div>
+
   </div>
 </div>
+
+<div id="transfer-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
+  <div class="bg-gray-800 w-full max-w-md rounded shadow-lg">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center p-3 border-b border-gray-600">
+      <h2 class="text-lg font-bold">💸 Self Account Transfer</h2>
+      <button onclick="closeTransferPopup()">❌</button>
+    </div>
+
+    <!-- Body -->
+    <div class="p-4 space-y-3">
+
+      <div>
+        <label>From Account</label>
+        <select id="tr-from" class="w-full p-2 rounded bg-gray-700"></select>
+      </div>
+
+      <div>
+        <label>To Account</label>
+        <select id="tr-to" class="w-full p-2 rounded bg-gray-700"></select>
+      </div>
+
+      <div>
+        <label>Date</label>
+        <input type="date" id="tr-date" class="w-full p-2 rounded bg-gray-700">
+      </div>
+
+      <div>
+        <label>Particular</label>
+        <input type="text" id="tr-note" class="w-full p-2 rounded bg-gray-700" placeholder="Transfer Note">
+      </div>
+
+      <div>
+        <label>Amount</label>
+        <input type="number" id="tr-amt" class="w-full p-2 rounded bg-gray-700">
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="p-3 border-t border-gray-600 flex gap-2">
+      <button onclick="doTransfer()" class="bg-green-600 px-4 py-2 rounded w-full">Transfer</button>
+      <button onclick="closeTransferPopup()" class="bg-red-600 px-4 py-2 rounded w-full">Cancel</button>
+    </div>
+
+  </div>
+</div>
+</div>
+
+
+
+
+
+
+
+
 
 <script>
 /* ----------------- CONFIG ----------------- */
@@ -151,6 +301,13 @@ function closeMaterialPopup(){ document.getElementById("material-modal").classLi
 /* -------- UI toggle -------- */
 document.getElementById("h-type").addEventListener("change", toggleForm);
 function toggleForm(){ const type=document.getElementById("h-type").value; document.getElementById("in-fields").style.display=(type==="in")?"grid":"none"; document.getElementById("out-fields").style.display=(type==="out")?"block":"none"; }
+
+
+document.getElementById("h-type").addEventListener("change", function () {
+  if (this.value === "transfer") {
+    showTransferPopup();
+  }
+});
 
 /* -------- Category management (local + Categories sheet sync) -------- */
 async function loadCategories(){
@@ -241,18 +398,214 @@ function recalcOutAmount(){
 /* -------- LOCAL STORAGE helpers (primary UI source) -------- */
 function saveLocalAndUI(entry){
   let data = JSON.parse(localStorage.getItem("hExpenses") || "[]");
-  // replace if same id exists, else push
-  const idx = data.findIndex(d => String(d.id) === String(entry.id));
-  if(idx >= 0) {
-    data[idx] = entry;
-  } else {
-    data.push(entry);
-  }
-  localStorage.setItem("hExpenses", JSON.stringify(data));
-  fetchHExpenses();
-  // reset editingId after save
-  editingId = null;
+const selectedBank = document.getElementById("h-bank").value;
+
+if(selectedBank){
+  data = data.filter(r => r.bank === selectedBank);
 }
+
+// 🔴 FROM (Debit)
+data.push({
+  id: "T-" + Date.now(),
+  type: "transfer-out",
+  bank: fromAccount,
+  amt: amount,
+  part: "Transfer to " + toAccount + " - " + particular,
+  dateIn: date
+});
+
+// 🟢 TO (Credit)
+data.push({
+  id: "T-" + (Date.now()+1),
+  type: "transfer-in",
+  bank: toAccount,
+  amt: amount,
+  part: "Transfer from " + fromAccount + " - " + particular,
+  dateIn: date
+});
+
+localStorage.setItem("hExpenses", JSON.stringify(data));
+fetchHExpenses();
+}
+
+
+
+
+function showTransferPopup() {
+  const modal = document.getElementById("transfer-modal");
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+
+  const banks = [...new Set(
+    JSON.parse(localStorage.getItem("hExpenses") || "[]").map(x => x.bank)
+  )];
+
+  const from = document.getElementById("tr-from");
+  const to = document.getElementById("tr-to");
+
+  from.innerHTML = "";
+  to.innerHTML = "";
+
+  banks.forEach(b => {
+    if(!b) return;
+    from.innerHTML += `<option value="${b}">${b}</option>`;
+    to.innerHTML += `<option value="${b}">${b}</option>`;
+  });
+
+  document.getElementById("tr-date").value = new Date().toISOString().slice(0,10);
+
+  populateTransferBanks();
+}
+
+function closeTransferPopup() {
+  document.getElementById("transfer-modal").classList.add("hidden");
+  document.getElementById("transfer-modal").classList.remove("flex");
+}
+
+
+
+
+function doTransfer(){
+
+  const fromAccount = document.getElementById("tr-from").value;
+  const toAccount   = document.getElementById("tr-to").value;
+  const amount      = Number(document.getElementById("tr-amt").value);
+  const particular  = document.getElementById("tr-note").value;
+  const date        = document.getElementById("tr-date").value;
+
+  if(!fromAccount || !toAccount || !amount){
+    alert("Fill all fields");
+    return;
+  }
+
+  if(fromAccount === toAccount){
+    alert("Same account transfer allowed नाही");
+    return;
+  }
+
+  let data = JSON.parse(localStorage.getItem("hExpenses") || "[]");
+
+  // 🔴 FROM (Debit)
+  data.push({
+    id: "T-" + Date.now(),
+    type: "transfer-out",
+    bank: fromAccount,
+    amt: amount,
+    part: "Transfer to " + toAccount + " - " + particular,
+    dateIn: date
+  });
+
+  // 🟢 TO (Credit)
+  data.push({
+    id: "T-" + (Date.now()+1),
+    type: "transfer-in",
+    bank: toAccount,
+    amt: amount,
+    part: "Transfer from " + fromAccount + " - " + particular,
+    dateIn: date
+  });
+
+  localStorage.setItem("hExpenses", JSON.stringify(data));
+
+  fetchHExpenses();
+
+  // clear
+  document.getElementById("tr-amt").value = "";
+  document.getElementById("tr-note").value = "";
+
+  closeTransferPopup();
+}
+
+function populateTransferBanks(){
+  const banks = ["Kotak Bank","SBI Bank","HDFC Bank","Cash"];
+
+  const from = document.getElementById("tr-from");
+  const to   = document.getElementById("tr-to");
+
+  from.innerHTML = "";
+  to.innerHTML   = "";
+
+  banks.forEach(b => {
+    from.innerHTML += `<option value="${b}">${b}</option>`;
+    to.innerHTML   += `<option value="${b}">${b}</option>`;
+  });
+}
+
+
+
+function renderBankSummary(){
+  let data = JSON.parse(localStorage.getItem("hExpenses") || "[]");
+
+  const map = {};
+
+  data.forEach(r => {
+    if(!r.bank) return;
+
+    if(!map[r.bank]){
+      map[r.bank] = 0;
+    }
+
+    if(r.type === "in" || r.type === "transfer-in"){
+      map[r.bank] += Number(r.amt || 0);
+    }
+    else if(r.type === "out" || r.type === "transfer-out"){
+      map[r.bank] -= Number(r.amt || 0);
+    }
+  });
+
+  const box = document.getElementById("bank-summary");
+  box.innerHTML = "";
+
+  Object.keys(map).forEach(bank => {
+    const bal = map[bank];
+
+    const div = document.createElement("div");
+    div.className = "p-3 rounded bg-gray-700 text-center";
+
+    div.innerHTML = `
+      <div class="font-bold">${bank}</div>
+      <div class="${bal>=0?'text-green-400':'text-red-400'} text-lg">₹${bal.toFixed(2)}</div>
+    `;
+
+    box.appendChild(div);
+  });
+}
+
+
+
+function renderDashboard(){
+  let data = JSON.parse(localStorage.getItem("hExpenses") || "[]");
+
+  const today = new Date().toISOString().slice(0,10);
+  const month = today.slice(0,7);
+
+  let tIn=0, tOut=0, mIn=0, mOut=0;
+
+  data.forEach(r => {
+    const d = (r.dateIn || "").slice(0,10);
+    const ym = (r.dateIn || "").slice(0,7);
+
+    if(r.type === "in" || r.type === "transfer-in"){
+      if(d === today) tIn += Number(r.amt||0);
+      if(ym === month) mIn += Number(r.amt||0);
+    }
+
+    if(r.type === "out" || r.type === "transfer-out"){
+      if(d === today) tOut += Number(r.amt||0);
+      if(ym === month) mOut += Number(r.amt||0);
+    }
+  });
+
+  document.getElementById("today-in").innerText = tIn.toFixed(2);
+  document.getElementById("today-out").innerText = tOut.toFixed(2);
+  document.getElementById("month-in").innerText = mIn.toFixed(2);
+  document.getElementById("month-out").innerText = mOut.toFixed(2);
+}
+
+
+
+
+
 
 /* -------- SAVE: local + sheet -------- */
 async function saveHExpense(){
@@ -287,14 +640,15 @@ async function saveHExpense(){
   const entry = { id, type, bank, part, amt, dateIn, cat, items };
 
   // Save local UI (replace-if-existing)
-  saveLocalAndUI(entry);
+  fetchHExpenses();
 
   // Save to Google Sheet (best-effort)
-  try{
-    await fetch(SCRIPT_URL + "?action=saveExpense", { method: "POST", body: JSON.stringify(entry) });
-  } catch(err){
-    console.warn("Sheet save failed (will remain in localStorage):", err);
-  }
+  fetch(SCRIPT_URL + "?action=saveExpense", { 
+  method: "POST", 
+  body: JSON.stringify(entry) 
+}).catch(err => {
+  console.warn("Sheet save failed:", err);
+});
 
   // Category save
   if(cat){
@@ -448,22 +802,32 @@ async function syncFromSheet(){
     });
 
     // Overwrite localStorage (no duplicates)
-    localStorage.setItem("hExpenses", JSON.stringify(arr));
+ // ✅ FINAL CLEAN PART
+   // 🔥 Local data घ्या
+let local = JSON.parse(localStorage.getItem("hExpenses") || "[]");
 
-    // Category sync from arr (also use fetchCategories separately in loadCategories)
-    let cats = JSON.parse(localStorage.getItem("hCats")||"[]");
-    arr.forEach(e => { if(e.cat && !cats.includes(e.cat)) cats.push(e.cat); });
-    localStorage.setItem("hCats", JSON.stringify(cats));
-    await loadCategories();
+// 🔥 फक्त transfer entries वेगळ्या ठेवा
+const transfers = local.filter(x => 
+  x.type === "transfer-in" || x.type === "transfer-out"
+);
+// 🔥 Merge (Sheet + Transfer)
+const finalData = [...arr, ...transfers];
 
-    fetchHExpenses();
-    alert("🔁 Synced from sheet: " + arr.length + " entries.");
-  } catch(e){
-    console.error("❌ Sync error:", e);
-    alert("Sync failed (check console).");
-  }
+// 🔥 Save
+localStorage.setItem("hExpenses", JSON.stringify(finalData));
+
+   let cats = JSON.parse(localStorage.getItem("hCats")||"[]");
+   arr.forEach(e => { if(e.cat && !cats.includes(e.cat)) cats.push(e.cat); });
+   localStorage.setItem("hCats", JSON.stringify(cats));
+
+   fetchHExpenses();
+
+   console.log("🔁 Synced:", arr.length);
+
+} catch(e) {
+   console.error("❌ Sync error:", e);  // ✅ correct place
 }
-
+}
 /* -------- Fetch & display (from localStorage) -------- */
 function fetchHExpenses(filtered=null){
   const list = document.getElementById("h-expense-list"); list.innerHTML = "";
@@ -472,8 +836,13 @@ function fetchHExpenses(filtered=null){
   let totalIn = 0, totalOut = 0;
 
   data.forEach(r => {
-    if(r.type === "in") totalIn += Number(r.amt||0);
-    else totalOut += Number(r.amt||0);
+    if(r.type === "in") {
+  totalIn += Number(r.amt||0);
+}
+else if(r.type === "out") {
+  totalOut += Number(r.amt||0);
+}
+// ❌ transfer ignore करा
 
     const div = document.createElement("div");
     div.className = "p-2 bg-gray-800 rounded expense-entry";
@@ -482,7 +851,7 @@ function fetchHExpenses(filtered=null){
     div.setAttribute("data-type", r.type || "");
     div.setAttribute("data-cat", r.cat || "");
     div.setAttribute("data-amt", r.amt || 0);
-
+    div.setAttribute("data-bank", r.bank || "");
     let itemsHTML = "";
     if(r.items && r.items.length){
       itemsHTML = "<table><tr><th>Date</th><th>Part</th><th>Qty</th><th>Unit</th><th>Rate</th><th>Amt</th></tr>";
@@ -505,7 +874,67 @@ function fetchHExpenses(filtered=null){
   document.getElementById("h-in-total").innerText = totalIn.toFixed(2);
   document.getElementById("h-out-total").innerText = totalOut.toFixed(2);
   renderChart(data);
+// 🔥 Account wise balance (UPDATED)
+const selectedBank = document.getElementById("h-bank").value;
+
+let bal = 0;
+
+data.forEach(r => {
+  if (r.bank === selectedBank) {
+
+  if (r.type === "in" || r.type === "transfer-in") {
+    bal += Number(r.amt || 0);
+  }
+
+  else if (r.type === "out" || r.type === "transfer-out") {
+    bal -= Number(r.amt || 0);
+  }
+
 }
+});
+
+document.getElementById("h-balance").innerText = bal.toFixed(2);
+renderBankSummary();
+renderDashboard();
+renderBankChart();
+}
+
+
+let bankChart;
+
+function renderBankChart(){
+  let data = JSON.parse(localStorage.getItem("hExpenses") || "[]");
+
+  const map = {};
+
+  data.forEach(r => {
+    if(!r.bank) return;
+
+    if(!map[r.bank]) map[r.bank] = 0;
+
+    if(r.type === "in" || r.type === "transfer-in"){
+      map[r.bank] += Number(r.amt||0);
+    } else if(r.type === "out" || r.type === "transfer-out"){
+      map[r.bank] -= Number(r.amt||0);
+    }
+  });
+
+  const ctx = document.getElementById("bankChart").getContext("2d");
+
+  if(bankChart) bankChart.destroy();
+
+  bankChart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: Object.keys(map),
+      datasets: [{
+        label: "Balance",
+        data: Object.values(map)
+      }]
+    }
+  });
+}
+
 
 /* -------- Delete (local + sheet) -------- */
 async function deleteExpense(id){
@@ -584,21 +1013,49 @@ function renderChart(data){
 }
 
 /* -------- Filter button -------- */
-document.getElementById("btn-apply-f").onclick = () => {
+function getFilters(){
+  return {
+    from: document.getElementById("flt-date-from").value,
+    to: document.getElementById("flt-date-to").value,
+    mon: document.getElementById("flt-month").value,
+    type: document.getElementById("flt-type").value,
+    cat: document.getElementById("flt-cat").value
+  };
+}
+
+function applyFilters(filters){
   let data = JSON.parse(localStorage.getItem("hExpenses")||"[]");
-  const from = document.getElementById("flt-date-from").value;
-  const to = document.getElementById("flt-date-to").value;
-  const mon = document.getElementById("flt-month").value;
-  const ftype = document.getElementById("flt-type").value;
-  const fcat = document.getElementById("flt-cat").value;
+
+  const selectedBank = document.getElementById("h-bank").value;
 
   let filtered = data.filter(r => {
+
     let ok = true;
-    if(ftype && r.type !== ftype) ok = false;
-    if(fcat && r.cat !== fcat) ok = false;
-    if(from && (r.dateIn || "").slice(0,10) < from) ok = false;
-    if(to && (r.dateIn || "").slice(0,10) > to) ok = false;
-    if(mon){ let ym = (r.dateIn||"").slice(0,7); if(ym !== mon) ok = false; }
+
+    // ✅ Bank
+    if(selectedBank && r.bank !== selectedBank) ok = false;
+
+    // ✅ Type
+    if(filters.type){
+      if(filters.type === "transfer"){
+        if(!(r.type === "transfer-in" || r.type === "transfer-out")) ok = false;
+      } else {
+        if(r.type !== filters.type) ok = false;
+      }
+    }
+
+    // ✅ Category
+    if(filters.cat && r.cat !== filters.cat) ok = false;
+
+    // ✅ Date
+    if(filters.from && (r.dateIn||"") < filters.from) ok = false;
+    if(filters.to && (r.dateIn||"") > filters.to) ok = false;
+
+    // ✅ Month
+    if(filters.mon){
+      if((r.dateIn||"").slice(0,7) !== filters.mon) ok = false;
+    }
+
     return ok;
   });
   fetchHExpenses(filtered);
@@ -613,27 +1070,35 @@ document.getElementById("btn-export-pdf").onclick = () => {
   const doc = new jsPDF();
 
   doc.setFontSize(14);
-  doc.text("Payment In & Expenses", 14, 15);
+
+  // ✅ ALWAYS ALL
+  doc.text(`Payment In & Expenses - ALL`, 14, 15);
 
   let rows = [];
   let totalIn = 0;
   let totalOut = 0;
 
   entries.forEach(div => {
+
+    // ❌ REMOVE BANK FILTER
+    // const selectedBank = document.getElementById("h-bank").value;
+    // const bank = div.getAttribute("data-bank") || "";
+    // if (bank !== selectedBank) return;
+
     const date = div.getAttribute("data-date") || "";
     const part = div.getAttribute("data-part") || "";
     const type = div.getAttribute("data-type") || "";
     const cat  = div.getAttribute("data-cat") || "";
     const amt  = parseFloat(div.getAttribute("data-amt") || "0");
 
-    if(type === "in") {
+    if(type === "in" || type === "transfer-in") {
       totalIn += amt;
-      rows.push([date, part, "-", "-", "-", amt.toFixed(2), type.toUpperCase(), cat]);
+      rows.push([date, part, "-", "-", "-", amt.toFixed(2), (type === "transfer-in" ? "IN" : type.toUpperCase()), cat]);
     }
 
     const table = div.querySelector("table");
-    if(type === "out" && table){
-      // skip summary line, only include item details
+
+    if((type === "out" || type === "transfer-out") && table){
       table.querySelectorAll("tr").forEach((tr,i)=>{
         if(i===0) return;
         const cells = Array.from(tr.querySelectorAll("td")).map(td=>td.innerText);
@@ -642,42 +1107,39 @@ document.getElementById("btn-export-pdf").onclick = () => {
           rows.push(cells.concat(["OUT", cat]));
         }
       });
-    } else if(type === "out" && !table){
+    } 
+    else if(type === "out" || type === "transfer-out"){
       totalOut += amt;
       rows.push([date, part, "-", "-", "-", amt.toFixed(2), "OUT", cat]);
     }
   });
 
-doc.autoTable({
-  startY: 25,
-  head: [['Date','Particular','Qty','Unit','Rate','Amount','Type','Category']],
-  body: rows,
-  theme: 'grid',
-  styles: { fontSize: 10 },
-  headStyles: { fillColor: [41, 128, 185] },
-  didParseCell: function (data) {
-    const col = data.column.index;
-    const row = data.row;
-    const cell = data.cell;
+  doc.autoTable({
+    startY: 25,
+    head: [['Date','Particular','Qty','Unit','Rate','Amount','Type','Category']],
+    body: rows,
+    theme: 'grid',
+    styles: { fontSize: 10 },
+    headStyles: { fillColor: [41, 128, 185] },
+    didParseCell: function (data) {
+      const col = data.column.index;
+      const row = data.row;
+      const cell = data.cell;
 
-    const typeText = row.raw[6]; // Type column (IN/OUT)
+      const typeText = row.raw[6];
 
-    // Green color for IN type
-    if (typeText === "IN" && (col === 5 || col === 6)) {
-      cell.styles.textColor = [34, 197, 94]; // green
-      cell.styles.fontStyle = 'bold';
+      if (typeText === "IN" && (col === 5 || col === 6)) {
+        cell.styles.textColor = [34, 197, 94];
+        cell.styles.fontStyle = 'bold';
+      }
+
+      if (typeText === "OUT" && (col === 5 || col === 6)) {
+        cell.styles.textColor = [239, 68, 68];
+        cell.styles.fontStyle = 'bold';
+      }
     }
+  });
 
-    // Red color for OUT type
-    if (typeText === "OUT" && (col === 5 || col === 6)) {
-      cell.styles.textColor = [239, 68, 68]; // red
-      cell.styles.fontStyle = 'bold';
-    }
-  }
-});
-
-
-  // 🔻 Totals after table
   let finalY = doc.lastAutoTable.finalY + 10;
   doc.setFontSize(12);
   doc.text(`Total IN: ${totalIn.toFixed(2)}`, 14, finalY);
@@ -687,6 +1149,134 @@ doc.autoTable({
   doc.save("expenses.pdf");
 };
 
+
+function getFilters(){
+  return {
+    from: document.getElementById("flt-date-from").value,
+    to: document.getElementById("flt-date-to").value,
+    mon: document.getElementById("flt-month").value,
+    type: document.getElementById("flt-type").value,
+    cat: document.getElementById("flt-cat").value
+  };
+}
+
+function applyFilters(filters){
+  let data = JSON.parse(localStorage.getItem("hExpenses")||"[]");
+
+  const selectedBank = document.getElementById("h-bank").value;
+
+  let filtered = data.filter(r => {
+
+    let ok = true;
+
+    // 🔹 Bank filter
+    if(selectedBank && r.bank !== selectedBank) ok = false;
+
+    // 🔹 Type filter
+    if(filters.type){
+      if(filters.type === "transfer"){
+        if(!(r.type === "transfer-in" || r.type === "transfer-out")) ok = false;
+      } else {
+        if(r.type !== filters.type) ok = false;
+      }
+    }
+
+    // 🔹 Category
+    if(filters.cat && r.cat !== filters.cat) ok = false;
+
+    // 🔹 Date
+    if(filters.from && (r.dateIn||"") < filters.from) ok = false;
+    if(filters.to && (r.dateIn||"") > filters.to) ok = false;
+
+    // 🔹 Month
+    if(filters.mon){
+      if((r.dateIn||"").slice(0,7) !== filters.mon) ok = false;
+    }
+
+    return ok;
+  });
+
+  fetchHExpenses(filtered);
+}
+
+
+
+function syncFromVEApp(){
+
+  let ve = JSON.parse(localStorage.getItem("ve_final_v1") || "{}");
+  let hData = JSON.parse(localStorage.getItem("hExpenses") || "[]");
+
+  // 🔥 जुना VE data remove (duplicate 100% बंद)
+  hData = hData.filter(x => x.source !== "VE");
+
+  // 🔥 Duplicate avoid करण्यासाठी IDs track कर
+  const existingIds = new Set(hData.map(x => x.id));
+
+  // 🟢 RECEIVED → IN
+  (ve.payments || []).forEach((p) => {
+
+    const id = "VE-IN-" + p.invoiceNo + "-" + p.date + "-" + p.received;
+
+    if(!existingIds.has(id)){
+      hData.push({
+        id: id,
+        type: "in",
+        bank: p.bank || "Cash",
+        amt: Number(p.received || 0),
+        part: (p.client || "") + " - " + (p.work || ""),
+        dateIn: p.date,
+        cat: "Received Payment",
+        source: "VE"
+      });
+
+      existingIds.add(id);   // 🔥 IMPORTANT
+    }
+
+  });
+
+  // 🔴 PAID → OUT
+  (ve.paidPayments || []).forEach((p) => {
+
+    const id = "VE-OUT-" + p.id;
+
+    if(!existingIds.has(id)){
+      hData.push({
+        id: id,
+        type: "out",
+        bank: p.bank || "Cash",
+        amt: Number(p.amount || 0),
+        part: p.name || "Paid",
+        dateIn: p.date,
+        cat: "Paid Payment",
+        source: "VE"
+      });
+
+      existingIds.add(id);   // 🔥 IMPORTANT
+    }
+
+  });
+
+  localStorage.setItem("hExpenses", JSON.stringify(hData));
+
+  fetchHExpenses();
+}
+
+
+
+function openApp(){
+  document.getElementById("home-screen").style.display = "none";
+  document.getElementById("app-screen").style.display = "block";
+}
+
+function goHome(){
+  document.getElementById("home-screen").style.display = "block";
+  document.getElementById("app-screen").style.display = "none";
+}
+
+
+
+
+
 /* -------- Toggle saved-section -------- */
 let isSavedVisible=false;
 function toggleSavedData(){ const sec=document.getElementById("saved-section"); isSavedVisible=!isSavedVisible; if(isSavedVisible){ sec.classList.remove("hidden"); } else { sec.classList.add("hidden"); } }
@@ -694,13 +1284,29 @@ function toggleSavedData(){ const sec=document.getElementById("saved-section"); 
 /* -------- Startup -------- */
 window.onload = () => {
   loadCategories();
-  if(!(localStorage.getItem("hExpenses"))){
-    syncFromSheet();
-  } else {
-    fetchHExpenses();
-  }
+
+  fetchHExpenses();  
+  
+  syncFromVEApp();   // ✅ ONLY HERE
+  
   toggleForm();
+
+  document.getElementById("h-bank").addEventListener("change", async () => {
+
+    const filters = getFilters();   
+
+    applyFilters(filters);          
+});
+
+  // ✅ ADD THIS
+  document.getElementById("btn-apply-f").onclick = () => {
+    const filters = getFilters();
+    applyFilters(filters);
+  };
 };
+
+
+
 </script>
 </body>
 </html>
