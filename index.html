@@ -397,35 +397,20 @@ function recalcOutAmount(){
 
 /* -------- LOCAL STORAGE helpers (primary UI source) -------- */
 function saveLocalAndUI(entry){
+
   let data = JSON.parse(localStorage.getItem("hExpenses") || "[]");
-const selectedBank = document.getElementById("h-bank").value;
 
-if(selectedBank){
-  data = data.filter(r => r.bank === selectedBank);
-}
+  // 🔥 Edit असेल तर जुनी entry remove करा
+  data = data.filter(x => String(x.id) !== String(entry.id));
 
-// 🔴 FROM (Debit)
-data.push({
-  id: "T-" + Date.now(),
-  type: "transfer-out",
-  bank: fromAccount,
-  amt: amount,
-  part: "Transfer to " + toAccount + " - " + particular,
-  dateIn: date
-});
+  // 🔥 NEW ENTRY ADD करा (MAIN FIX)
+  data.push(entry);
 
-// 🟢 TO (Credit)
-data.push({
-  id: "T-" + (Date.now()+1),
-  type: "transfer-in",
-  bank: toAccount,
-  amt: amount,
-  part: "Transfer from " + fromAccount + " - " + particular,
-  dateIn: date
-});
+  // 🔥 SAVE
+  localStorage.setItem("hExpenses", JSON.stringify(data));
 
-localStorage.setItem("hExpenses", JSON.stringify(data));
-fetchHExpenses();
+  // 🔥 UI refresh
+  fetchHExpenses();
 }
 
 
@@ -638,7 +623,7 @@ async function saveHExpense(){
   // if editingId exists, preserve it, else generate new
   const id = editingId || Date.now();
   const entry = { id, type, bank, part, amt, dateIn, cat, items };
-
+  saveLocalAndUI(entry);   // 🔥 IMPORTANT
   // Save local UI (replace-if-existing)
   fetchHExpenses();
 
