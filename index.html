@@ -624,8 +624,6 @@ async function saveHExpense(){
   const id = editingId || Date.now();
   const entry = { id, type, bank, part, amt, dateIn, cat, items };
   saveLocalAndUI(entry);   // 🔥 IMPORTANT
-  // 🔥 ADD THIS
-saveHToFirestore();
   // Save local UI (replace-if-existing)
   fetchHExpenses();
 
@@ -1189,10 +1187,7 @@ function applyFilters(filters){
 
 
 function syncFromVEApp(){
-  
-  if(localStorage.getItem("veSynced")) return;   // 🔥 ADD THIS
-  localStorage.setItem("veSynced", "yes");
-  
+
   let ve = JSON.parse(localStorage.getItem("ve_final_v1") || "{}");
   let hData = JSON.parse(localStorage.getItem("hExpenses") || "[]");
 
@@ -1274,8 +1269,6 @@ function toggleSavedData(){ const sec=document.getElementById("saved-section"); 
 /* -------- Startup -------- */
 window.onload = () => {
   loadCategories();
-  
-  loadHFromFirestore();   // 🔥 ADD THIS (load only)
 
   fetchHExpenses();  
   
