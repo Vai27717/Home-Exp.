@@ -409,6 +409,9 @@ function saveLocalAndUI(entry){
   // 🔥 SAVE
   localStorage.setItem("hExpenses", JSON.stringify(data));
 
+  // 🔥 ADD THIS LINE
+  saveHToFirestore();
+
   // 🔥 UI refresh
   fetchHExpenses();
 }
@@ -932,6 +935,9 @@ async function deleteExpense(id){
   } catch(e){
     console.warn("Sheet delete failed:", e);
   }
+
+   // 🔥 ADD THIS
+  saveHToFirestore();
   fetchHExpenses();
 }
 
@@ -1267,23 +1273,25 @@ let isSavedVisible=false;
 function toggleSavedData(){ const sec=document.getElementById("saved-section"); isSavedVisible=!isSavedVisible; if(isSavedVisible){ sec.classList.remove("hidden"); } else { sec.classList.add("hidden"); } }
 
 /* -------- Startup -------- */
-window.onload = () => {
+window.onload = async () => {
+
+  // 🔥 FIRST: Firestore मधून data load
+  await loadHFromFirestore();
+
+  // 🔽 मग बाकी
   loadCategories();
 
   fetchHExpenses();  
-  
-  syncFromVEApp();   // ✅ ONLY HERE
-  
+
+  syncFromVEApp();   // VE sync
+
   toggleForm();
 
-  document.getElementById("h-bank").addEventListener("change", async () => {
-
+  document.getElementById("h-bank").addEventListener("change", () => {
     const filters = getFilters();   
-
     applyFilters(filters);          
-});
+  });
 
-  // ✅ ADD THIS
   document.getElementById("btn-apply-f").onclick = () => {
     const filters = getFilters();
     applyFilters(filters);
@@ -1293,5 +1301,62 @@ window.onload = () => {
 
 
 </script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { getFirestore, setDoc, getDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBaaV8A69XqckjnVuMCy6F5GyEuqRJvt_Y",
+  authDomain: "vaibhav-enterprises-ee336.firebaseapp.com",
+  projectId: "vaibhav-enterprises-ee336",
+  storageBucket: "vaibhav-enterprises-ee336.firebasestorage.app",
+  messagingSenderId: "172689572436",
+  appId: "1:172689572436:web:5a68b14a5fea0eb44fa3c1"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// 🔥 NEW COLLECTION (important)
+const DOC = doc(db, "apps", "h_expenses_data");
+
+// 🔽 SAVE
+async function saveHToFirestore(){
+  let data = JSON.parse(localStorage.getItem("hExpenses") || "[]");
+
+  await setDoc(DOC, { hExpenses: data });
+
+  console.log("✅ H Expenses Saved to Firestore");
+}
+
+// 🔽 LOAD
+async function loadHFromFirestore(){
+  const snap = await getDoc(DOC);
+
+  if(snap.exists()){
+    const remote = snap.data().hExpenses || [];
+
+    localStorage.setItem("hExpenses", JSON.stringify(remote));
+
+    fetchHExpenses();
+
+    console.log("✅ H Expenses Loaded from Firestore");
+  }
+}
+
+window.saveHToFirestore = saveHToFirestore;
+window.loadHFromFirestore = loadHFromFirestore;
+
+// 🔥 AUTO LOAD (VERY IMPORTANT)
+window.addEventListener("load", () => {
+  loadHFromFirestore();
+});
+</script>
+
+
 </body>
+
+
+
 </html>
