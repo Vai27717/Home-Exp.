@@ -494,7 +494,9 @@ function doTransfer(){
   });
 
   localStorage.setItem("hExpenses", JSON.stringify(data));
-
+  
+  // 🔥 ADD THIS
+saveHToFirestore();
   fetchHExpenses();
 
   // clear
