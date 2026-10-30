@@ -57,73 +57,10 @@
  <div class="modal-content" style="max-width:650px;max-height:85vh;overflow:auto;background:#f8fafc;color:#111">
   <span class="close" onclick="closeHomeMaterialModal()">×</span><h3 class="text-xl font-bold mb-3">🧱 Home Material List</h3>
   <div class="grid grid-cols-3 gap-2 mb-3">
-   <div><label>Name / Item</label><input id="he-mat-name" class="w-full p-2 border rounded" list="he-item-suggestions" placeholder="Select or type Item">
-    <datalist id="he-item-suggestions">
-     <option value="Sakhar"></option>
-     <option value="society Tea"></option>
-     <option value="Gamini Oil"></option>
-     <option value="Turdal"></option>
-     <option value="Chanadal"></option>
-     <option value="Mugdal"></option>
-     <option value="Masur"></option>
-     <option value="Harbhare"></option>
-     <option value="Safed Vatane"></option>
-     <option value="Chavli"></option>
-     <option value="Shengadane"></option>
-     <option value="Pavte"></option>
-     <option value="Mug"></option>
-     <option value="Pohe"></option>
-     <option value="Rava"></option>
-     <option value="Garam Masala"></option>
-     <option value="Khada Masala"></option>
-     <option value="Dhana Powder"></option>
-     <option value="Tikhala Mirchi Powder"></option>
-     <option value="Goda masala"></option>
-     <option value="Halad"></option>
-     <option value="Lajiz Biryani Masala"></option>
-     <option value="Chicken Masala"></option>
-     <option value="Kanda Masala"></option>
-     <option value="Jire"></option>
-     <option value="Mohari"></option>
-     <option value="Hing"></option>
-     <option value="Soda Powder"></option>
-     <option value="Papad"></option>
-     <option value="Lonche"></option>
-     <option value="Vim Bar"></option>
-     <option value="Rin Bar"></option>
-     <option value="Sarfexcel"></option>
-     <option value="Angache Saban"></option>
-     <option value="Tup"></option>
-     <option value="Ghi"></option>
-     <option value="Khobare"></option>
-     <option value="Khobrel Oil"></option>
-     <option value="Naral"></option>
-     <option value="Machis"></option>
-     <option value="Agarbatti"></option>
-     <option value="Dhup"></option>
-     <option value="Kapur"></option>
-     <option value="Pinjar"></option>
-     <option value="Gandhagoli"></option>
-     <option value="Kande"></option>
-     <option value="Batate"></option>
-     <option value="Tometo"></option>
-     <option value="Kothimbiri"></option>
-     <option value="Kadipatta"></option>
-     <option value="Kakadi"></option>
-     <option value="Kobi"></option>
-     <option value="Floor"></option>
-     <option value="Vangi"></option>
-     <option value="Dodka"></option>
-     <option value="Gavar"></option>
-     <option value="Shimla Mirchi"></option>
-     <option value="Bhendi"></option>
-     <option value="Ghosale"></option>
-     <option value="Paneer"></option>
-     <option value="Dahi"></option>
-     <option value="Tak"></option>
-     <option value="Greenpeace"></option>
-     <option value="Dudh"></option>
-    </datalist>
+   <div><label>Name / Item</label><div class="he-item-autocomplete" style="position:relative">
+     <input id="he-mat-name" class="w-full p-2 border rounded" autocomplete="off" placeholder="Type Item Name">
+     <div id="he-item-suggestions" style="display:none;position:absolute;left:0;right:0;top:100%;max-height:190px;overflow-y:auto;background:#fff;border:1px solid #cbd5e1;border-radius:6px;z-index:10020;box-shadow:0 4px 10px rgba(0,0,0,.15)"></div>
+    </div>
    </div>
    <div><label>Qty</label><input id="he-mat-qty" type="number" min="1" value="1" class="w-full p-2 border rounded"></div>
    <div><label>Unit</label><input id="he-mat-unit" class="w-full p-2 border rounded" list="he-unit-suggestions" placeholder="Select or type Unit">
@@ -143,6 +80,160 @@
   <footer class="text-center muted mt-4">© Vaibhav Enterprises</footer>
 </div>
 <script src="app.js"></script>
+
+<script>
+(function () {
+  const itemNames = [
+    "Sakhar",
+    "society Tea",
+    "Gamini Oil",
+    "Turdal",
+    "Chanadal",
+    "Mugdal",
+    "Masur",
+    "Harbhare",
+    "Safed Vatane",
+    "Chavli",
+    "Shengadane",
+    "Pavte",
+    "Mug",
+    "Pohe",
+    "Rava",
+    "Garam Masala",
+    "Khada Masala",
+    "Dhana Powder",
+    "Tikhala Mirchi Powder",
+    "Goda masala",
+    "Halad",
+    "Lajiz Biryani Masala",
+    "Chicken Masala",
+    "Kanda Masala",
+    "Jire",
+    "Mohari",
+    "Hing",
+    "Soda Powder",
+    "Papad",
+    "Lonche",
+    "Vim Bar",
+    "Rin Bar",
+    "Sarfexcel",
+    "Angache Saban",
+    "Tup",
+    "Ghi",
+    "Khobare",
+    "Khobrel Oil",
+    "Naral",
+    "Machis",
+    "Agarbatti",
+    "Dhup",
+    "Kapur",
+    "Pinjar",
+    "Gandhagoli",
+    "Kande",
+    "Batate",
+    "Tometo",
+    "Kothimbiri",
+    "Kadipatta",
+    "Kakadi",
+    "Kobi",
+    "Floor",
+    "Vangi",
+    "Dodka",
+    "Gavar",
+    "Shimla Mirchi",
+    "Bhendi",
+    "Ghosale",
+    "Paneer",
+    "Dahi",
+    "Tak",
+    "Greenpeace",
+    "Dudh"
+  ];
+  const input = document.getElementById('he-mat-name');
+  const list = document.getElementById('he-item-suggestions');
+  if (!input || !list) return;
+
+  let activeIndex = -1;
+
+  function hideList() {
+    list.style.display = 'none';
+    list.innerHTML = '';
+    activeIndex = -1;
+  }
+
+  function chooseItem(value) {
+    input.value = value;
+    hideList();
+    input.focus();
+  }
+
+  function showMatches() {
+    const query = input.value.trim().toLocaleLowerCase();
+    list.innerHTML = '';
+    activeIndex = -1;
+    if (!query) {
+      hideList();
+      return;
+    }
+
+    const matches = itemNames.filter(name =>
+      name.toLocaleLowerCase().includes(query)
+    );
+
+    if (!matches.length) {
+      hideList();
+      return;
+    }
+
+    matches.forEach((name, index) => {
+      const option = document.createElement('div');
+      option.textContent = name;
+      option.style.cssText = 'padding:9px 11px;cursor:pointer;border-bottom:1px solid #eef2f7;font-size:14px;';
+      option.addEventListener('mouseenter', () => {
+        activeIndex = index;
+        highlightActive();
+      });
+      option.addEventListener('mousedown', event => {
+        event.preventDefault();
+        chooseItem(name);
+      });
+      list.appendChild(option);
+    });
+    list.style.display = 'block';
+  }
+
+  function highlightActive() {
+    Array.from(list.children).forEach((option, index) => {
+      option.style.background = index === activeIndex ? '#dbeafe' : '#fff';
+    });
+    if (activeIndex >= 0 && list.children[activeIndex]) {
+      list.children[activeIndex].scrollIntoView({block:'nearest'});
+    }
+  }
+
+  input.addEventListener('input', showMatches);
+  input.addEventListener('keydown', event => {
+    const count = list.children.length;
+    if (list.style.display !== 'block' || !count) return;
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      activeIndex = (activeIndex + 1) % count;
+      highlightActive();
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      activeIndex = (activeIndex - 1 + count) % count;
+      highlightActive();
+    } else if (event.key === 'Enter' && activeIndex >= 0) {
+      event.preventDefault();
+      chooseItem(list.children[activeIndex].textContent);
+    } else if (event.key === 'Escape') {
+      hideList();
+    }
+  });
+  input.addEventListener('blur', () => setTimeout(hideList, 150));
+})();
+</script>
+
 <script type="module" src="firestore.js"></script>
 </body>
 </html>
