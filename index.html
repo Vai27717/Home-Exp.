@@ -56,7 +56,85 @@
 <div id="he-material-modal" class="modal" style="display:none;z-index:9999">
  <div class="modal-content" style="max-width:650px;max-height:85vh;overflow:auto;background:#f8fafc;color:#111">
   <span class="close" onclick="closeHomeMaterialModal()">×</span><h3 class="text-xl font-bold mb-3">🧱 Home Material List</h3>
-  <div class="grid grid-cols-3 gap-2 mb-3"><div><label>Name / Item</label><input id="he-mat-name" class="w-full p-2 border rounded" placeholder="Cement"></div><div><label>Unit</label><input id="he-mat-unit" class="w-full p-2 border rounded" placeholder="Bag / Kg / Nos"></div><div><label>Qty</label><input id="he-mat-qty" type="number" min="1" value="1" class="w-full p-2 border rounded"></div></div>
+  <div class="grid grid-cols-3 gap-2 mb-3">
+   <div><label>Name / Item</label><input id="he-mat-name" class="w-full p-2 border rounded" list="he-item-suggestions" placeholder="Select or type Item">
+    <datalist id="he-item-suggestions">
+     <option value="Sakhar"></option>
+     <option value="society Tea"></option>
+     <option value="Gamini Oil"></option>
+     <option value="Turdal"></option>
+     <option value="Chanadal"></option>
+     <option value="Mugdal"></option>
+     <option value="Masur"></option>
+     <option value="Harbhare"></option>
+     <option value="Safed Vatane"></option>
+     <option value="Chavli"></option>
+     <option value="Shengadane"></option>
+     <option value="Pavte"></option>
+     <option value="Mug"></option>
+     <option value="Pohe"></option>
+     <option value="Rava"></option>
+     <option value="Garam Masala"></option>
+     <option value="Khada Masala"></option>
+     <option value="Dhana Powder"></option>
+     <option value="Tikhala Mirchi Powder"></option>
+     <option value="Goda masala"></option>
+     <option value="Halad"></option>
+     <option value="Lajiz Biryani Masala"></option>
+     <option value="Chicken Masala"></option>
+     <option value="Kanda Masala"></option>
+     <option value="Jire"></option>
+     <option value="Mohari"></option>
+     <option value="Hing"></option>
+     <option value="Soda Powder"></option>
+     <option value="Papad"></option>
+     <option value="Lonche"></option>
+     <option value="Vim Bar"></option>
+     <option value="Rin Bar"></option>
+     <option value="Sarfexcel"></option>
+     <option value="Angache Saban"></option>
+     <option value="Tup"></option>
+     <option value="Ghi"></option>
+     <option value="Khobare"></option>
+     <option value="Khobrel Oil"></option>
+     <option value="Naral"></option>
+     <option value="Machis"></option>
+     <option value="Agarbatti"></option>
+     <option value="Dhup"></option>
+     <option value="Kapur"></option>
+     <option value="Pinjar"></option>
+     <option value="Gandhagoli"></option>
+     <option value="Kande"></option>
+     <option value="Batate"></option>
+     <option value="Tometo"></option>
+     <option value="Kothimbiri"></option>
+     <option value="Kadipatta"></option>
+     <option value="Kakadi"></option>
+     <option value="Kobi"></option>
+     <option value="Floor"></option>
+     <option value="Vangi"></option>
+     <option value="Dodka"></option>
+     <option value="Gavar"></option>
+     <option value="Shimla Mirchi"></option>
+     <option value="Bhendi"></option>
+     <option value="Ghosale"></option>
+     <option value="Paneer"></option>
+     <option value="Dahi"></option>
+     <option value="Tak"></option>
+     <option value="Greenpeace"></option>
+     <option value="Dudh"></option>
+    </datalist>
+   </div>
+   <div><label>Qty</label><input id="he-mat-qty" type="number" min="1" value="1" class="w-full p-2 border rounded"></div>
+   <div><label>Unit</label><input id="he-mat-unit" class="w-full p-2 border rounded" list="he-unit-suggestions" placeholder="Select or type Unit">
+    <datalist id="he-unit-suggestions">
+     <option value="Kg."></option><option value="Gram"></option><option value="Ltr."></option>
+     <option value="ML."></option><option value="Nos"></option><option value="No"></option>
+     <option value="Peace"></option><option value="Packet"></option><option value="Box"></option>
+     <option value="Gattu"></option><option value="Pair"></option>
+    </datalist>
+   </div>
+  </div>
   <button class="smallbtn mb-3" onclick="addHomeMaterialRow()">＋ Add Item</button>
   <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th>Sr.</th><th>Name</th><th>Qty</th><th>Unit</th><th>− / +</th><th>Action</th></tr></thead><tbody id="he-material-rows"></tbody></table></div>
   <div class="flex flex-wrap gap-2 mt-4"><button class="smallbtn" onclick="saveHomeMaterials()">💾 Save List</button><button class="smallbtn" onclick="shareHomeMaterialsWhatsApp()">🟢 Share WhatsApp</button><button class="smallbtn" onclick="closeHomeMaterialModal()">Close</button></div>
